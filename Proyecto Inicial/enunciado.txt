@@ -1,0 +1,35 @@
+Sistema de Monitoreo Ambiental con Arduino sobre IPv6
+
+
+Objetivo del Proyecto:
+Desarrollar un sistema de monitoreo ambiental utilizando placas Arduino conectadas a una red IPv6. El sistema recogerá datos en tiempo real, como temperatura, humedad y calidad del aire, y los transmitirá a través de la red IPv6 a un servidor donde serán procesados y visualizados en una aplicación web.
+
+Descripción del Proyecto:
+Configuración de la Red IPv6:
+
+Implementar y configurar una red IPv6 para soportar la comunicación entre las placas Arduino y el servidor.
+Asignar direcciones IPv6 a cada placa Arduino utilizando métodos como SLAAC o DHCPv6.
+Configurar rutas y asegurar la red IPv6 utilizando IPSec para proteger las comunicaciones.
+Despliegue y Configuración de Placas Arduino:
+
+Utilizar placas Arduino compatibles con conectividad IPv6, como Arduino Uno con un shield Ethernet o Wi-Fi que soporte IPv6.
+Conectar sensores ambientales a las placas Arduino para medir variables como temperatura, humedad y calidad del aire.
+Programar las placas Arduino para capturar datos de los sensores y enviarlos a través de la red IPv6 a un servidor central en intervalos regulares.
+Desarrollo del Backend:
+
+Implementar un servidor que reciba, procese y almacene los datos enviados por las placas Arduino.
+Crear una API que permita que la aplicación web acceda a los datos en tiempo real.
+Asegurar que el backend sea compatible con IPv6 y esté protegido contra accesos no autorizados.
+Desarrollo de la Aplicación Web:
+
+Crear una aplicación web alojada en un servidor IPv6 que visualice los datos ambientales en gráficos en tiempo real.
+Implementar funciones para generar reportes históricos, configurar alertas basadas en umbrales, y gestionar las placas Arduino desde la interfaz web.
+La aplicación web debe ser accesible desde cualquier dispositivo conectado a la red IPv6.
+Optimización y Pruebas:
+
+Realizar pruebas para asegurar la correcta conectividad y transmisión de datos en la red IPv6.
+Optimizar el código y la configuración de las placas Arduino para maximizar la eficiencia energética y la precisión de los datos.
+Documentación y Entregables:
+
+Documentar en un video todo el proceso de configuración de la red IPv6, programación de las placas Arduino, desarrollo del backend y la aplicación web, y las pruebas realizadas.
+Entregar el video demostrativo que muestre el funcionamiento completo del sistema, desde la recolección de datos con Arduino hasta la visualización en la aplicación web.

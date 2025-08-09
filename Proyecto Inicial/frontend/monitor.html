@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor LDR - Sistema IPv6</title>
+    <meta name="description" content="Monitor en tiempo real del sensor LDR con historial compartido">
+    <meta name="author" content="Sistema Monitoreo IPv6">
+    <meta name="keywords" content="Arduino, IPv6, LDR, monitor, tiempo real, historial">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="shared/css/base.css">
+    <link rel="stylesheet" href="shared/css/navigation.css">
+    <link rel="stylesheet" href="pages/monitor/monitor.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body class="theme-medium">
+    <!-- Navegación (se carga dinámicamente) -->
+    <div id="navigation-container"></div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- Header del Monitor -->
+            <div class="monitor-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="monitor-title">
+                            <i class="bi bi-activity"></i>
+                            Monitor LDR en Tiempo Real
+                        </h1>
+                        <p class="monitor-subtitle text-muted">
+                            Visualización de datos históricos compartidos entre dispositivos
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="monitor-controls">
+                            <button class="btn btn-outline-primary btn-sm me-2" id="pauseBtn">
+                                <i class="bi bi-pause-fill"></i>
+                                Pausar
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm me-2" id="clearBtn">
+                                <i class="bi bi-trash"></i>
+                                Limpiar
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" onclick="forceReconnectMonitor()">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                Reconectar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Estado de Sesión -->
+            <div class="session-panel glass mb-4">
+                <div class="row g-3">
+                    <!-- Estado de Conexión -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="session-card">
+                            <div class="session-card__icon">
+                                <i class="bi bi-wifi" id="connectionIcon"></i>
+                            </div>
+                            <div class="session-card__content">
+                                <div class="session-card__title">Estado de Conexión</div>
+                                <div class="session-card__value" id="connectionStatus">Conectando...</div>
+                                <div class="session-card__subtitle" id="protocolInfo">Iniciando sistema</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tiempo de Sesión -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="session-card">
+                            <div class="session-card__icon">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="session-card__content">
+                                <div class="session-card__title">Tiempo de Sesión</div>
+                                <div class="session-card__value" id="sessionTime">00:00</div>
+                                <div class="session-card__subtitle" id="startTime">Iniciando...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dispositivos Conectados -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="session-card">
+                            <div class="session-card__icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="session-card__content">
+                                <div class="session-card__title">Dispositivos</div>
+                                <div class="session-card__value" id="connectedDevices">1</div>
+                                <div class="session-card__subtitle">conectados ahora</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total de Lecturas -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="session-card">
+                            <div class="session-card__icon">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                            <div class="session-card__content">
+                                <div class="session-card__title">Total Lecturas</div>
+                                <div class="session-card__value" id="totalReadings">0</div>
+                                <div class="session-card__subtitle" id="readingRate">0/min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Gráfico Principal -->
+                <div class="col-xl-8 col-lg-8">
+                    <div class="chart-panel glass">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="bi bi-graph-up-arrow"></i>
+                                Historial Compartido del Sensor LDR
+                            </h5>
+                            <div class="chart-info">
+                                <span class="chart-info__item">
+                                    <i class="bi bi-circle-fill text-success"></i>
+                                    Tiempo Real
+                                </span>
+                                <span class="chart-info__item">
+                                    <i class="bi bi-people-fill"></i>
+                                    Compartido
+                                </span>
+                                <span class="chart-info__item" id="currentValue">
+                                    <i class="bi bi-speedometer2"></i>
+                                    Valor: ---
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+
+                        <!-- Indicadores de Tema -->
+                        <div class="theme-indicators">
+                            <div class="theme-zone theme-zone--dark">
+                                <span class="zone-label">🌙 Nocturno</span>
+                                <span class="zone-range">0-199</span>
+                            </div>
+                            <div class="theme-zone theme-zone--medium">
+                                <span class="zone-label">🌅 Atardecer</span>
+                                <span class="zone-range">200-599</span>
+                            </div>
+                            <div class="theme-zone theme-zone--bright">
+                                <span class="zone-label">☀️ Brillante</span>
+                                <span class="zone-range">600-1023</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Lateral -->
+                <div class="col-xl-4 col-lg-4">
+                    <!-- Estadísticas de la Sesión -->
+                    <div class="stats-panel glass mb-4">
+                        <h5 class="stats-title">
+                            <i class="bi bi-bar-chart"></i>
+                            Estadísticas de la Sesión
+                        </h5>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-label">Valor Actual</div>
+                                <div class="stat-value stat-value--current" id="statCurrent">---</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Mínimo</div>
+                                <div class="stat-value stat-value--min" id="statMin">---</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Máximo</div>
+                                <div class="stat-value stat-value--max" id="statMax">---</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Promedio</div>
+                                <div class="stat-value stat-value--avg" id="statAvg">---</div>
+                            </div>
+                        </div>
+
+                        <!-- Distribución por Temas -->
+                        <div class="theme-distribution mt-3">
+                            <h6 class="distribution-title">Distribución por Ambiente</h6>
+                            <div class="distribution-item">
+                                <span class="distribution-label">🌙 Nocturno</span>
+                                <div class="distribution-bar">
+                                    <div class="distribution-fill distribution-fill--dark" id="darkPercent" style="width: 0%"></div>
+                                </div>
+                                <span class="distribution-value" id="darkCount">0</span>
+                            </div>
+                            <div class="distribution-item">
+                                <span class="distribution-label">🌅 Atardecer</span>
+                                <div class="distribution-bar">
+                                    <div class="distribution-fill distribution-fill--medium" id="mediumPercent" style="width: 0%"></div>
+                                </div>
+                                <span class="distribution-value" id="mediumCount">0</span>
+                            </div>
+                            <div class="distribution-item">
+                                <span class="distribution-label">☀️ Brillante</span>
+                                <div class="distribution-bar">
+                                    <div class="distribution-fill distribution-fill--bright" id="brightPercent" style="width: 0%"></div>
+                                </div>
+                                <span class="distribution-value" id="brightCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Sistema -->
+                    <div class="system-panel glass">
+                        <h5 class="system-title">
+                            <i class="bi bi-gear"></i>
+                            Información del Sistema
+                        </h5>
+                        
+                        <div class="system-info">
+                            <div class="info-item">
+                                <span class="info-label">
+                                    <i class="bi bi-router"></i>
+                                    Protocolo
+                                </span>
+                                <span class="info-value" id="systemProtocol">Detectando...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">
+                                    <i class="bi bi-speedometer2"></i>
+                                    Última Lectura
+                                </span>
+                                <span class="info-value" id="lastReading">--:--:--</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">
+                                    <i class="bi bi-graph-up"></i>
+                                    Velocidad
+                                </span>
+                                <span class="info-value" id="readingSpeed">-- datos/min</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">
+                                    <i class="bi bi-stopwatch"></i>
+                                    Latencia
+                                </span>
+                                <span class="info-value" id="systemLatency">-- ms</span>
+                            </div>
+                        </div>
+
+                        <!-- Estado de Servicios -->
+                        <div class="services-status mt-3">
+                            <h6 class="services-title">Estado de Servicios</h6>
+                            <div class="service-item">
+                                <span class="service-label">WebSocket</span>
+                                <span class="service-status service-status--unknown" id="wsStatus">
+                                    <i class="bi bi-circle-fill"></i>
+                                    Conectando
+                                </span>
+                            </div>
+                            <div class="service-item">
+                                <span class="service-label">API Backend</span>
+                                <span class="service-status service-status--unknown" id="apiStatus">
+                                    <i class="bi bi-circle-fill"></i>
+                                    Verificando
+                                </span>
+                            </div>
+                            <div class="service-item">
+                                <span class="service-label">Arduino</span>
+                                <span class="service-status service-status--unknown" id="arduinoStatus">
+                                    <i class="bi bi-circle-fill"></i>
+                                    Esperando
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Datos Históricos -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="data-panel glass">
+                        <div class="data-header">
+                            <h5 class="data-title">
+                                <i class="bi bi-table"></i>
+                                Registro de Datos Históricos
+                            </h5>
+                            <div class="data-controls">
+                                <span class="data-counter">
+                                    Mostrando últimas <span id="dataCount">0</span> lecturas
+                                </span>
+                                <button class="btn btn-outline-primary btn-sm" id="exportBtn">
+                                    <i class="bi bi-download"></i>
+                                    Exportar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="table table-hover" id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Valor LDR</th>
+                                        <th>Ambiente</th>
+                                        <th>Timestamp</th>
+                                        <th>Δ Anterior</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="bi bi-hourglass-split"></i>
+                                            Esperando datos del servidor...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="loading-text mt-3">Conectando al monitor...</p>
+        </div>
+    </div>
+
+    <!-- Toast para notificaciones -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                <strong class="me-auto">Monitor LDR</strong>
+                <small class="text-muted">ahora</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Mensaje de notificación
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts modulares -->
+    <script type="module" src="shared/js/config.js"></script>
+    <script type="module" src="shared/js/websocket-service.js"></script>
+    <script type="module" src="shared/js/api-service.js"></script>
+    <script type="module" src="pages/monitor/monitor.js"></script>
+
+    <!-- Script de carga de navegación -->
+    <script>
+        // Cargar navegación de forma asíncrona
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('shared/components/navigation.html');
+                const navigationHTML = await response.text();
+                document.getElementById('navigation-container').innerHTML = navigationHTML;
+            } catch (error) {
+                console.error('Error cargando navegación:', error);
+            }
+        });
+
+        // Funciones globales para debugging
+        window.monitorDebug = {
+            getStatus: () => window.monitorApp?.getStatus(),
+            forceReconnect: () => window.monitorApp?.forceReconnect(),
+            clearData: () => window.monitorApp?.clearData(),
+            exportData: () => window.monitorApp?.exportData()
+        };
+
+        // Información de debug en consola
+        console.log(`
+        📊 MONITOR LDR v2.0 - HISTORIAL COMPARTIDO
+        ==========================================
+        
+        📱 Página: Monitor en Tiempo Real
+        🎯 Estado: Inicializando sistema...
+        🌐 Protocolo: IPv4/IPv6 (detección automática)
+        
+        📈 Características:
+        ├── Gráfico histórico compartido
+        ├── Múltiples dispositivos sincronizados  
+        ├── Estadísticas de sesión en tiempo real
+        └── Tabla de datos persistente
+        
+        🔧 Controles de debug disponibles:
+        ├── window.monitorDebug.getStatus()
+        ├── window.monitorDebug.forceReconnect()
+        ├── window.monitorDebug.clearData()
+        └── window.monitorDebug.exportData()
+        
+        💡 Para demostración:
+        1. Abre este monitor en múltiples dispositivos
+        2. Todos verán el mismo historial desde inicio del servidor
+        3. Los cambios se sincronizan en tiempo real
+        4. Nuevos dispositivos cargan historial completo
+        `);
+    </script>
+</body>
+</html>

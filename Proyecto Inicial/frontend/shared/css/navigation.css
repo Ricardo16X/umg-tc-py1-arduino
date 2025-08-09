@@ -1,0 +1,238 @@
+/* =======================================
+   NAVEGACIÓN - Estilos de la Barra de Navegación
+   ======================================= */
+
+.navbar-custom {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    box-shadow: var(--shadow-lg);
+    border-bottom: 3px solid var(--secondary-color);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: var(--transition-base);
+}
+
+.navbar-custom .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+    transition: var(--transition-base);
+}
+
+.navbar-custom .navbar-brand:hover {
+    color: var(--bright-accent) !important;
+    transform: scale(1.05);
+}
+
+.navbar-custom .navbar-brand i {
+    font-size: 1.75rem;
+    color: var(--bright-accent);
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.3));
+}
+
+/* === ELEMENTOS DE NAVEGACIÓN === */
+.navbar-custom .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    margin: 0 var(--spacing-xs);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar-custom .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: var(--transition-slow);
+}
+
+.navbar-custom .nav-link:hover::before {
+    left: 100%;
+}
+
+.navbar-custom .nav-link:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.navbar-custom .nav-link i {
+    font-size: 1.1rem;
+    transition: var(--transition-base);
+}
+
+.navbar-custom .nav-link:hover i {
+    transform: scale(1.2);
+}
+
+/* === PÁGINA ACTIVA === */
+.navbar-custom .nav-link.active {
+    background: rgba(52, 152, 219, 0.2);
+    color: white !important;
+    box-shadow: inset 0 0 0 2px var(--secondary-color);
+}
+
+.navbar-custom .nav-link.active i {
+    color: var(--bright-accent);
+    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+}
+
+/* === BOTÓN HAMBURGUESA (MÓVIL) === */
+.navbar-custom .navbar-toggler {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    transition: var(--transition-base);
+}
+
+.navbar-custom .navbar-toggler:hover {
+    border-color: var(--secondary-color);
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.navbar-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* === INDICADOR DE CONEXIÓN === */
+.connection-indicator {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    z-index: 1001;
+}
+
+.connection-indicator__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transition: var(--transition-base);
+}
+
+.connection-indicator__dot--connected {
+    background: var(--success-color);
+    box-shadow: 0 0 8px rgba(39, 174, 96, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.connection-indicator__dot--disconnected {
+    background: var(--accent-color);
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+}
+
+.connection-indicator__dot--connecting {
+    background: var(--warning-color);
+    box-shadow: 0 0 8px rgba(243, 156, 18, 0.5);
+    animation: spin 1s linear infinite;
+}
+
+/* === BREADCRUMB === */
+.breadcrumb-custom {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    margin: 0;
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+}
+
+.breadcrumb-custom .breadcrumb-item {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: var(--font-size-sm);
+}
+
+.breadcrumb-custom .breadcrumb-item.active {
+    color: white;
+    font-weight: 500;
+}
+
+.breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+    content: '>';
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 991px) {
+    .navbar-custom .navbar-collapse {
+        background: rgba(44, 62, 80, 0.95);
+        backdrop-filter: blur(10px);
+        margin-top: var(--spacing-md);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-md);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .navbar-custom .nav-link {
+        margin: var(--spacing-xs) 0;
+        text-align: center;
+    }
+    
+    .connection-indicator {
+        position: static;
+        justify-content: center;
+        margin: var(--spacing-md) 0;
+        padding: var(--spacing-sm);
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: var(--border-radius-md);
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-custom .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .navbar-custom .navbar-brand i {
+        font-size: 1.5rem;
+    }
+    
+    .breadcrumb-custom {
+        padding: var(--spacing-xs) var(--spacing-md);
+        text-align: center;
+    }
+}
+
+/* === TEMA ADAPTATIVO === */
+.navbar-custom.theme-dark {
+    background: linear-gradient(135deg, var(--dark-primary) 0%, var(--dark-secondary) 100%);
+    border-bottom-color: var(--dark-accent);
+}
+
+.navbar-custom.theme-medium {
+    background: linear-gradient(135deg, var(--medium-primary) 0%, var(--medium-secondary) 100%);
+    border-bottom-color: var(--medium-accent);
+}
+
+.navbar-custom.theme-bright {
+    background: linear-gradient(135deg, var(--bright-primary) 0%, var(--bright-secondary) 100%);
+    border-bottom-color: var(--bright-accent);
+    color: #333 !important;
+}
+
+.navbar-custom.theme-bright .navbar-brand,
+.navbar-custom.theme-bright .nav-link {
+    color: #333 !important;
+}
+
+.navbar-custom.theme-bright .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 33, 33, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}

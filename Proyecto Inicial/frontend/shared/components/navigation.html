@@ -1,0 +1,271 @@
+<!-- =======================================
+     NAVEGACIÓN COMPARTIDA
+     ======================================= -->
+
+<nav class="navbar navbar-expand-lg navbar-custom" id="mainNavbar">
+    <div class="container">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="index.html">
+            <i class="bi bi-lightbulb-fill"></i>
+            LDR Monitor IPv6
+        </a>
+
+        <!-- Botón hamburguesa para móvil -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav" aria-controls="navbarNav" 
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Enlaces de navegación -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html" data-page="lamp">
+                        <i class="bi bi-house-fill"></i>
+                        Lámpara
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="monitor.html" data-page="monitor">
+                        <i class="bi bi-speedometer2"></i>
+                        Monitor
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="reports.html" data-page="reports">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        Reportes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="settings.html" data-page="settings">
+                        <i class="bi bi-gear-fill"></i>
+                        Configuración
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Indicador de conexión en la navegación -->
+            <div class="connection-indicator ms-3">
+                <div class="connection-indicator__dot connection-indicator__dot--connecting" 
+                     id="navConnectionDot"></div>
+                <span class="connection-indicator__text" id="navConnectionText">
+                    Conectando...
+                </span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Breadcrumb opcional -->
+<nav class="breadcrumb-custom d-none" id="breadcrumbNav">
+    <div class="container">
+        <ol class="breadcrumb mb-0" id="breadcrumbList">
+            <!-- Se llena dinámicamente -->
+        </ol>
+    </div>
+</nav>
+
+<script>
+// =======================================
+// LÓGICA DE NAVEGACIÓN
+// =======================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeNavigation();
+});
+
+function initializeNavigation() {
+    // Marcar página activa
+    highlightActivePage();
+    
+    // Configurar breadcrumb
+    updateBreadcrumb();
+    
+    // Configurar eventos
+    setupNavigationEvents();
+}
+
+function highlightActivePage() {
+    const currentPage = getCurrentPageName();
+    const navLinks = document.querySelectorAll('.nav-link[data-page]');
+    
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.page === currentPage) {
+            link.classList.add('active');
+        }
+    });
+}
+
+function getCurrentPageName() {
+    const path = window.location.pathname;
+    const filename = path.split('/').pop();
+    
+    switch (filename) {
+        case 'index.html':
+        case '':
+            return 'lamp';
+        case 'monitor.html':
+            return 'monitor';
+        case 'reports.html':
+            return 'reports';
+        case 'settings.html':
+            return 'settings';
+        default:
+            return 'lamp';
+    }
+}
+
+function updateBreadcrumb() {
+    const currentPage = getCurrentPageName();
+    const breadcrumbList = document.getElementById('breadcrumbList');
+    const breadcrumbNav = document.getElementById('breadcrumbNav');
+    
+    if (!breadcrumbList) return;
+    
+    const breadcrumbs = {
+        lamp: [
+            { text: 'Inicio', href: 'index.html' },
+            { text: 'Lámpara Virtual', active: true }
+        ],
+        monitor: [
+            { text: 'Inicio', href: 'index.html' },
+            { text: 'Monitor en Tiempo Real', active: true }
+        ],
+        reports: [
+            { text: 'Inicio', href: 'index.html' },
+            { text: 'Reportes Históricos', active: true }
+        ],
+        settings: [
+            { text: 'Inicio', href: 'index.html' },
+            { text: 'Configuración', active: true }
+        ]
+    };
+    
+    const currentBreadcrumbs = breadcrumbs[currentPage] || breadcrumbs.lamp;
+    
+    breadcrumbList.innerHTML = currentBreadcrumbs.map(item => {
+        if (item.active) {
+            return `<li class="breadcrumb-item active">${item.text}</li>`;
+        } else {
+            return `<li class="breadcrumb-item"><a href="${item.href}">${item.text}</a></li>`;
+        }
+    }).join('');
+    
+    // Mostrar breadcrumb solo si no estamos en la página principal
+    if (currentPage !== 'lamp') {
+        breadcrumbNav.classList.remove('d-none');
+    }
+}
+
+function setupNavigationEvents() {
+    // Animación hover en enlaces
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        link.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Cerrar navbar en móvil al hacer clic en enlace
+    const navbarCollapse = document.getElementById('navbarNav');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth < 992) {
+                const bsCollapse = new bootstrap.Collapse(navbarCollapse);
+                bsCollapse.hide();
+            }
+        });
+    });
+}
+
+// =======================================
+// FUNCIONES GLOBALES PARA ACTUALIZAR NAVEGACIÓN
+// =======================================
+
+/**
+ * Actualizar indicador de conexión en la navegación
+ * @param {boolean} connected - Estado de conexión
+ * @param {string} message - Mensaje de estado
+ */
+function updateNavConnectionStatus(connected, message = '') {
+    const dot = document.getElementById('navConnectionDot');
+    const text = document.getElementById('navConnectionText');
+    
+    if (!dot || !text) return;
+    
+    // Limpiar clases anteriores
+    dot.className = 'connection-indicator__dot';
+    
+    if (connected) {
+        dot.classList.add('connection-indicator__dot--connected');
+        text.textContent = 'Conectado';
+    } else if (message.includes('conectando') || message.includes('Conectando')) {
+        dot.classList.add('connection-indicator__dot--connecting');
+        text.textContent = 'Conectando...';
+    } else {
+        dot.classList.add('connection-indicator__dot--disconnected');
+        text.textContent = 'Desconectado';
+    }
+}
+
+/**
+ * Actualizar tema de la navegación según el tema de la lámpara
+ * @param {string} theme - Tema actual (dark, medium, bright)
+ */
+function updateNavTheme(theme) {
+    const navbar = document.getElementById('mainNavbar');
+    if (!navbar) return;
+    
+    // Limpiar clases de tema anteriores
+    navbar.classList.remove('theme-dark', 'theme-medium', 'theme-bright');
+    
+    // Agregar nueva clase de tema
+    navbar.classList.add(`theme-${theme}`);
+}
+
+/**
+ * Mostrar notificación temporal en la navegación
+ * @param {string} message - Mensaje a mostrar
+ * @param {string} type - Tipo de mensaje (success, warning, error, info)
+ * @param {number} duration - Duración en ms
+ */
+function showNavNotification(message, type = 'info', duration = 3000) {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = `
+        top: 80px;
+        right: 20px;
+        z-index: 1050;
+        min-width: 300px;
+        max-width: 400px;
+        box-shadow: var(--shadow-lg);
+    `;
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove después del tiempo especificado
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, duration);
+}
+
+// Hacer funciones disponibles globalmente
+window.updateNavConnectionStatus = updateNavConnectionStatus;
+window.updateNavTheme = updateNavTheme;
+window.showNavNotification = showNavNotification;
+</script>

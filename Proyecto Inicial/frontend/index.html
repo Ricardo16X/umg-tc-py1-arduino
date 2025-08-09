@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lámpara Virtual LDR - Monitor IPv6</title>
+    <meta name="description" content="Sistema de monitoreo ambiental con Arduino IPv6 - Lámpara Virtual">
+    <meta name="author" content="Tu Nombre">
+    <meta name="keywords" content="Arduino, IPv6, LDR, sensor, lámpara virtual, monitoreo">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="shared/css/base.css">
+    <link rel="stylesheet" href="shared/css/navigation.css">
+    <link rel="stylesheet" href="pages/lamp/lamp.css">
+    
+    <!-- Favicon (opcional) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💡</text></svg>">
+</head>
+<body class="theme-medium">
+    <!-- Navegación (se carga dinámicamente) -->
+    <div id="navigation-container"></div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <!-- Panel lateral de información -->
+                <aside class="col-xl-3 col-lg-4 col-md-5 d-none d-md-block">
+                    <div class="info-panel glass animate-slide-in-left">
+                        <!-- Estado de conexión -->
+                        <div class="connection-section mb-4">
+                            <h5 class="info-panel__title">
+                                <i class="bi bi-wifi"></i>
+                                Estado de Conexión
+                            </h5>
+                            <div class="status status--connecting" id="connectionStatus">
+                                <i class="bi bi-arrow-clockwise animate-spin"></i>
+                                Iniciando sistema...
+                            </div>
+                        </div>
+
+                        <!-- Datos del sensor -->
+                        <div class="sensor-section mb-4">
+                            <h5 class="info-panel__title">
+                                <i class="bi bi-speedometer2"></i>
+                                Sensor LDR
+                            </h5>
+                            <div class="sensor-display">
+                                <div class="ldr-value" id="ldrValue">---</div>
+                                <div class="ldr-label">Valor actual</div>
+                            </div>
+                        </div>
+
+                        <!-- Tema actual -->
+                        <div class="theme-section mb-4">
+                            <h5 class="info-panel__title">
+                                <i class="bi bi-palette"></i>
+                                Ambiente Actual
+                            </h5>
+                            <div class="theme-display">
+                                <div class="theme-name" id="themeName">CARGANDO</div>
+                                <div class="theme-description" id="themeDescription">
+                                    Iniciando sistema...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información de tiempo -->
+                        <div class="time-section">
+                            <h5 class="info-panel__title">
+                                <i class="bi bi-clock"></i>
+                                Información Temporal
+                            </h5>
+                            <div class="time-info">
+                                <div class="time-item">
+                                    <span class="time-label">Última actualización:</span>
+                                    <span class="time-value" id="lastUpdate">--:--:--</span>
+                                </div>
+                                <div class="time-item">
+                                    <span class="time-label">Cambios detectados:</span>
+                                    <span class="time-value" id="changeCount">0</span>
+                                </div>
+                                <div class="time-item">
+                                    <span class="time-label">Conectado desde:</span>
+                                    <span class="time-value" id="connectionTime">--:--:--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Área principal de la lámpara -->
+                <section class="col-xl-6 col-lg-8 col-md-7 col-12">
+                    <div class="lamp-container animate-fade-in">
+                        <!-- Título principal -->
+                        <div class="lamp-header text-center mb-4 d-md-none">
+                            <h1 class="lamp-title">
+                                <i class="bi bi-lightbulb-fill"></i>
+                                Lámpara Virtual LDR
+                            </h1>
+                            <p class="lamp-subtitle">
+                                Monitor ambiental en tiempo real
+                            </p>
+                        </div>
+
+                        <!-- Información móvil (visible solo en móvil) -->
+                        <div class="mobile-info d-md-none mb-4">
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <div class="mobile-card glass text-center">
+                                        <div class="mobile-value" id="mobileValue">---</div>
+                                        <div class="mobile-label">LDR</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mobile-card glass text-center">
+                                        <div class="mobile-status" id="mobileStatus">
+                                            <i class="bi bi-arrow-clockwise animate-spin"></i>
+                                        </div>
+                                        <div class="mobile-label">Estado</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mobile-card glass text-center">
+                                        <div class="mobile-theme" id="mobileTheme">---</div>
+                                        <div class="mobile-label">Tema</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lámpara virtual -->
+                        <div class="lamp-wrapper">
+                            <div class="lamp" id="mainLamp">
+                                <div class="lamp__shade">
+                                    <div class="lamp__glow" id="lampGlow"></div>
+                                    <div class="lamp__reflection"></div>
+                                </div>
+                                <div class="lamp__post"></div>
+                                <div class="lamp__base"></div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción rápida -->
+                        <div class="action-buttons text-center mt-4">
+                            <button class="btn-theme btn-theme--primary me-2" onclick="forcereconnect()">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                Reconectar
+                            </button>
+                            <button class="btn-theme btn-theme--success me-2" onclick="openMonitor()">
+                                <i class="bi bi-speedometer2"></i>
+                                Ver Monitor
+                            </button>
+                            <button class="btn-theme btn-theme--warning" onclick="openReports()">
+                                <i class="bi bi-graph-up-arrow"></i>
+                                Ver Reportes
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Panel de estadísticas rápidas -->
+                <aside class="col-xl-3 d-none d-xl-block">
+                    <div class="stats-panel glass animate-slide-in-right">
+                        <h5 class="stats-panel__title">
+                            <i class="bi bi-graph-up"></i>
+                            Estadísticas Rápidas
+                        </h5>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="minValue">--</div>
+                                <div class="stat-label">Mínimo</div>
+                                <div class="stat-icon">
+                                    <i class="bi bi-arrow-down-circle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-value" id="maxValue">--</div>
+                                <div class="stat-label">Máximo</div>
+                                <div class="stat-icon">
+                                    <i class="bi bi-arrow-up-circle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-value" id="avgValue">--</div>
+                                <div class="stat-label">Promedio</div>
+                                <div class="stat-icon">
+                                    <i class="bi bi-bar-chart"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalReadings">--</div>
+                                <div class="stat-label">Total</div>
+                                <div class="stat-icon">
+                                    <i class="bi bi-collection"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progreso del día (opcional) -->
+                        <div class="daily-progress mt-4">
+                            <h6 class="daily-progress__title">Actividad del día</h6>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     id="dailyProgress" role="progressbar" 
+                                     style="width: 0%" aria-valuenow="0" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                <span id="dailyReadings">0</span> lecturas hoy
+                            </small>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Efectos ambientales -->
+    <div class="ambient-effects">
+        <div class="stars-container" id="starsContainer"></div>
+        <div class="clouds-container" id="cloudsContainer"></div>
+        <div class="sunrays-container" id="sunraysContainer"></div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="loading-text mt-3">Inicializando sistema...</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts modulares -->
+    <script type="module" src="shared/js/config.js"></script>
+    <script type="module" src="shared/js/websocket-service.js"></script>
+    <script type="module" src="shared/js/api-service.js"></script>
+    <script type="module" src="pages/lamp/lamp.js"></script>
+    <script type="module" src="pages/lamp/effects.js"></script>
+    <script type="module" src="pages/lamp/lamp-page.js"></script>
+
+    <!-- Script de carga de navegación -->
+    <script>
+        // Cargar navegación de forma asíncrona
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('shared/components/navigation.html');
+                const navigationHTML = await response.text();
+                document.getElementById('navigation-container').innerHTML = navigationHTML;
+            } catch (error) {
+                console.error('Error cargando navegación:', error);
+            }
+        });
+
+        // Funciones globales para botones
+        function forcereconnect() {
+            if (window.lampApp) {
+                window.lampApp.forceReconnect();
+            }
+        }
+
+        function openMonitor() {
+            window.location.href = 'monitor.html';
+        }
+
+        function openReports() {
+            window.location.href = 'reports.html';
+        }
+
+        // Información de debug en consola
+        console.log(`
+        💡 LÁMPARA VIRTUAL LDR v2.0
+        ============================
+        
+        📱 Página: Lámpara Principal
+        🎯 Estado: Inicializando...
+        
+        🔧 Controles disponibles:
+        ├── forcereconnect() - Forzar reconexión
+        ├── openMonitor() - Ir a monitor
+        └── openReports() - Ir a reportes
+        
+        📊 Cuando esté cargado:
+        ├── window.lampApp - Instancia principal
+        ├── window.lampComponent - Componente lámpara
+        └── window.effectsManager - Gestor de efectos
+        `);
+    </script>
+</body>
+</html>

@@ -1,0 +1,907 @@
+/**
+ * REPORTES LDR - ESTILOS PRINCIPALES
+ * Diseño para generación de reportes y exportación de datos
+ */
+
+/* =======================================
+   VARIABLES CSS PARA REPORTES
+   ======================================= */
+:root {
+    /* Colores principales */
+    --reports-primary: #007bff;
+    --reports-success: #28a745;
+    --reports-warning: #ffc107;
+    --reports-danger: #dc3545;
+    --reports-info: #17a2b8;
+    --reports-dark: #343a40;
+    
+    /* Colores de fondo */
+    --reports-bg: rgba(255, 255, 255, 0.95);
+    --reports-card-bg: rgba(255, 255, 255, 0.98);
+    --reports-overlay: rgba(0, 0, 0, 0.1);
+    
+    /* Colores para ambientes LDR */
+    --env-dark: #2c3e50;
+    --env-medium: #e67e22;
+    --env-bright: #f1c40f;
+    
+    /* Efectos y espaciado */
+    --reports-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --reports-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+    --reports-border-radius: 12px;
+    --reports-transition: all 0.3s ease;
+}
+
+/* Ajustes por tema */
+.theme-dark {
+    --reports-bg: rgba(20, 20, 30, 0.95);
+    --reports-card-bg: rgba(30, 30, 45, 0.98);
+    --reports-overlay: rgba(255, 255, 255, 0.1);
+}
+
+.theme-medium {
+    --reports-bg: rgba(250, 240, 230, 0.95);
+    --reports-card-bg: rgba(255, 250, 245, 0.98);
+}
+
+.theme-bright {
+    --reports-bg: rgba(255, 255, 255, 0.98);
+    --reports-card-bg: rgba(255, 255, 255, 1);
+}
+
+/* =======================================
+   LAYOUT PRINCIPAL
+   ======================================= */
+.main-content {
+    padding-top: 2rem;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+/* =======================================
+   HEADER DE REPORTES
+   ======================================= */
+.reports-header {
+    margin-bottom: 2rem;
+}
+
+.reports-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--reports-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.reports-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+    color: #6c757d !important;
+}
+
+.reports-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.reports-actions .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: var(--reports-transition);
+}
+
+/* =======================================
+   PANEL DE ESTADO DEL SISTEMA
+   ======================================= */
+.system-status-panel {
+    background: var(--reports-card-bg);
+    border-radius: var(--reports-border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--reports-shadow);
+    border: 1px solid var(--reports-overlay);
+}
+
+.status-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--reports-bg);
+    border-radius: 10px;
+    border: 1px solid var(--reports-overlay);
+    transition: var(--reports-transition);
+    height: 100%;
+}
+
+.status-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--reports-shadow-hover);
+}
+
+.status-icon {
+    font-size: 2rem;
+    color: var(--reports-primary);
+    min-width: 50px;
+    text-align: center;
+}
+
+.status-content {
+    flex: 1;
+}
+
+.status-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.status-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #212529 !important;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.status-subtitle {
+    font-size: 0.8rem;
+    color: #6c757d !important;
+}
+
+/* =======================================
+   PANELES PRINCIPALES
+   ======================================= */
+.summary-panel,
+.export-panel,
+.export-history-panel,
+.data-preview-panel {
+    background: var(--reports-card-bg);
+    border-radius: var(--reports-border-radius);
+    box-shadow: var(--reports-shadow);
+    border: 1px solid var(--reports-overlay);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 2px solid var(--reports-overlay);
+    margin-bottom: 1.5rem;
+}
+
+.panel-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529 !important;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.panel-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* =======================================
+   RESUMEN EJECUTIVO
+   ======================================= */
+.summary-panel {
+    padding: 0;
+}
+
+.summary-content {
+    padding: 0 1.5rem 1.5rem;
+}
+
+/* Métricas principales */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.metric-item {
+    text-align: center;
+    padding: 1.25rem;
+    background: var(--reports-bg);
+    border-radius: 10px;
+    border: 1px solid var(--reports-overlay);
+    transition: var(--reports-transition);
+}
+
+.metric-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6c757d !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0;
+    color: #212529 !important;
+}
+
+.metric-value--min {
+    color: var(--reports-info) !important;
+}
+
+.metric-value--max {
+    color: var(--reports-danger) !important;
+}
+
+.metric-value--avg {
+    color: var(--reports-success) !important;
+}
+
+/* Distribución por ambientes */
+.environment-distribution {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--reports-overlay);
+}
+
+.distribution-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #212529 !important;
+}
+
+.distribution-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.distribution-item {
+    padding: 1rem;
+    background: var(--reports-bg);
+    border-radius: 8px;
+    border: 1px solid var(--reports-overlay);
+}
+
+.distribution-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.environment-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #212529 !important;
+}
+
+.environment-percentage {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--reports-primary);
+}
+
+.distribution-progress {
+    height: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.distribution-count {
+    font-size: 0.8rem;
+    color: #6c757d !important;
+    display: block;
+}
+
+/* Gráfico de resumen */
+.summary-chart {
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--reports-overlay);
+}
+
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #212529 !important;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+#summaryChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* =======================================
+   PANEL DE EXPORTACIÓN
+   ======================================= */
+.export-panel {
+    padding: 0;
+}
+
+.export-options {
+    padding: 0 1.5rem;
+}
+
+.export-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    background: var(--reports-bg);
+    border-radius: 10px;
+    border: 1px solid var(--reports-overlay);
+    transition: var(--reports-transition);
+}
+
+.export-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.export-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.export-header i {
+    font-size: 1.5rem;
+}
+
+.export-info {
+    flex: 1;
+}
+
+.export-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #212529 !important;
+    margin-bottom: 0.25rem;
+}
+
+.export-description {
+    font-size: 0.8rem;
+    color: #6c757d !important;
+}
+
+.export-option .btn {
+    min-width: 120px;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Configuración de exportación */
+.export-config {
+    padding: 1.5rem;
+    background: var(--reports-bg);
+    border-top: 2px solid var(--reports-overlay);
+}
+
+.config-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #212529 !important;
+}
+
+.config-group {
+    margin-bottom: 1rem;
+}
+
+.config-group:last-child {
+    margin-bottom: 0;
+}
+
+.config-group .form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057 !important;
+    margin-bottom: 0.5rem;
+}
+
+.config-group .form-check-label {
+    font-size: 0.85rem;
+    color: #495057 !important;
+}
+
+/* =======================================
+   HISTORIAL DE EXPORTACIONES
+   ======================================= */
+.export-history-panel {
+    padding: 0;
+}
+
+.export-history {
+    padding: 1.5rem;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: var(--reports-bg);
+    border-radius: 6px;
+    border: 1px solid var(--reports-overlay);
+    font-size: 0.85rem;
+}
+
+.history-item:last-child {
+    margin-bottom: 0;
+}
+
+.history-info {
+    flex: 1;
+}
+
+.history-title {
+    font-weight: 600;
+    color: #212529 !important;
+    margin-bottom: 0.25rem;
+}
+
+.history-details {
+    color: #6c757d !important;
+    font-size: 0.8rem;
+}
+
+.history-size {
+    font-size: 0.8rem;
+    color: #6c757d !important;
+    font-weight: 500;
+}
+
+/* =======================================
+   VISTA PREVIA DE DATOS
+   ======================================= */
+.data-preview-panel {
+    padding: 0;
+}
+
+.data-info {
+    font-size: 0.85rem;
+    color: #6c757d !important;
+    margin-right: 1rem;
+}
+
+.table-responsive {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.table {
+    margin-bottom: 0;
+    background: white;
+}
+
+.table thead th {
+    background: var(--reports-primary);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: none;
+    padding: 1rem 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table tbody td {
+    padding: 0.75rem;
+    border-color: var(--reports-overlay);
+    font-size: 0.875rem;
+    vertical-align: middle;
+    color: #212529 !important;
+}
+
+.table tbody tr:hover {
+    background: var(--reports-overlay);
+}
+
+/* Estilos específicos de celdas */
+.table .record-number {
+    font-weight: 700;
+    color: var(--reports-primary) !important;
+}
+
+.table .ldr-value {
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: #212529 !important;
+}
+
+.table .environment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.environment-badge--dark {
+    background: var(--env-dark);
+    color: white;
+}
+
+.environment-badge--medium {
+    background: var(--env-medium);
+    color: white;
+}
+
+.environment-badge--bright {
+    background: var(--env-bright);
+    color: #2c3e50;
+}
+
+.table .timestamp {
+    font-family: 'Courier New', monospace;
+    color: #6c757d !important;
+    font-size: 0.8rem;
+}
+
+.table .raw-data {
+    font-family: 'Courier New', monospace;
+    color: #6c757d !important;
+    font-size: 0.8rem;
+}
+
+.table .action-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.table .action-buttons .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* =======================================
+   LOADING Y OVERLAYS
+   ======================================= */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+}
+
+.loading-overlay.hidden {
+    display: none;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+.loading-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* =======================================
+   ANIMACIONES
+   ======================================= */
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-slide-up {
+    animation: slideInUp 0.5s ease-out;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Animaciones para elementos nuevos */
+.new-export {
+    animation: slideInUp 0.5s ease-out;
+}
+
+.data-updated {
+    animation: pulse 0.6s ease-in-out;
+}
+
+/* =======================================
+   RESPONSIVE DESIGN
+   ======================================= */
+@media (max-width: 1200px) {
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}
+
+@media (max-width: 992px) {
+    .reports-title {
+        font-size: 2rem;
+    }
+    
+    .status-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .export-option {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .export-header {
+        justify-content: center;
+    }
+    
+    .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding-top: 1rem;
+    }
+    
+    .reports-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .reports-title {
+        font-size: 1.75rem;
+    }
+    
+    .reports-actions {
+        margin-top: 1rem;
+        justify-content: center;
+    }
+    
+    .system-status-panel,
+    .summary-panel,
+    .export-panel,
+    .export-history-panel,
+    .data-preview-panel {
+        padding: 1rem;
+    }
+    
+    .panel-header {
+        padding: 1rem 0 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .summary-content {
+        padding: 0;
+    }
+    
+    .export-options {
+        padding: 0;
+    }
+    
+    .export-config {
+        padding: 1rem;
+    }
+    
+    .export-history {
+        padding: 1rem;
+    }
+    
+    .table-responsive {
+        padding: 0 0 1rem;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+    
+    .status-card {
+        padding: 1rem;
+    }
+    
+    .status-icon {
+        font-size: 1.5rem;
+    }
+    
+    .status-value {
+        font-size: 1.5rem;
+    }
+    
+    .metric-item {
+        padding: 1rem;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+    }
+    
+    /* Ocultar algunas columnas en móvil */
+    .table th:nth-child(5),
+    .table td:nth-child(5),
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .reports-title {
+        font-size: 1.5rem;
+    }
+    
+    .status-value {
+        font-size: 1.25rem;
+    }
+    
+    .metric-value {
+        font-size: 1.25rem;
+    }
+    
+    .export-option {
+        padding: 1rem;
+    }
+    
+    .chart-container {
+        height: 180px;
+    }
+    
+    /* Ocultar más columnas en móviles pequeños */
+    .table th:nth-child(4),
+    .table td:nth-child(4),
+    .table th:nth-child(5),
+    .table td:nth-child(5),
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        display: none;
+    }
+}
+
+/* =======================================
+   UTILIDADES Y ESTADOS
+   ======================================= */
+.glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--reports-primary), var(--reports-info));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Estados de botones */
+.btn-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-loading .spinner-border {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Estados de exportación */
+.export-success {
+    border-color: var(--reports-success) !important;
+    background: rgba(40, 167, 69, 0.1) !important;
+}
+
+.export-error {
+    border-color: var(--reports-danger) !important;
+    background: rgba(220, 53, 69, 0.1) !important;
+}
+
+.export-processing {
+    border-color: var(--reports-warning) !important;
+    background: rgba(255, 193, 7, 0.1) !important;
+}
+
+/* =======================================
+   PRINT STYLES
+   ======================================= */
+@media print {
+    .reports-actions,
+    .export-panel,
+    .export-history-panel,
+    .loading-overlay,
+    .toast-container {
+        display: none !important;
+    }
+    
+    .main-content {
+        padding: 0;
+    }
+    
+    .glass {
+        background: white !important;
+        backdrop-filter: none !important;
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+    }
+    
+    .chart-container {
+        height: 400px;
+    }
+    
+    .summary-panel,
+    .data-preview-panel {
+        break-inside: avoid;
+    }
+    
+    .table {
+        font-size: 0.8rem;
+    }
+}

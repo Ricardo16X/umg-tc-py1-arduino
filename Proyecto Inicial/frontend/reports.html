@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes LDR - Sistema IPv6</title>
+    <meta name="description" content="Generación de reportes y exportación de datos del sensor LDR">
+    <meta name="author" content="Sistema Monitoreo IPv6">
+    <meta name="keywords" content="Arduino, IPv6, LDR, reportes, estadísticas, exportar">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- jsPDF para exportar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- SheetJS para exportar Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="shared/css/base.css">
+    <link rel="stylesheet" href="shared/css/navigation.css">
+    <link rel="stylesheet" href="pages/reports/reports.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body class="theme-medium">
+    <!-- Navegación (se carga dinámicamente) -->
+    <div id="navigation-container"></div>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- Header de Reportes -->
+            <div class="reports-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="reports-title">
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                            Reportes y Exportación
+                        </h1>
+                        <p class="reports-subtitle text-muted">
+                            Genera reportes del sistema de monitoreo LDR y exporta datos históricos
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="reports-actions">
+                            <button class="btn btn-outline-primary btn-sm me-2" id="refreshDataBtn">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                Actualizar Datos
+                            </button>
+                            <button class="btn btn-success btn-sm" id="generateAllBtn">
+                                <i class="bi bi-download"></i>
+                                Generar Todos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Estado del Sistema -->
+            <div class="system-status-panel glass mb-4">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="status-card">
+                            <div class="status-icon">
+                                <i class="bi bi-server" id="systemIcon"></i>
+                            </div>
+                            <div class="status-content">
+                                <div class="status-title">Estado del Sistema</div>
+                                <div class="status-value" id="systemStatus">Verificando...</div>
+                                <div class="status-subtitle" id="systemUptime">--:--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="status-card">
+                            <div class="status-icon">
+                                <i class="bi bi-database"></i>
+                            </div>
+                            <div class="status-content">
+                                <div class="status-title">Datos Disponibles</div>
+                                <div class="status-value" id="totalRecords">0</div>
+                                <div class="status-subtitle">registros totales</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="status-card">
+                            <div class="status-icon">
+                                <i class="bi bi-calendar3"></i>
+                            </div>
+                            <div class="status-content">
+                                <div class="status-title">Período de Datos</div>
+                                <div class="status-value" id="dataRange">--</div>
+                                <div class="status-subtitle" id="lastUpdate">última actualización</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="status-card">
+                            <div class="status-icon">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
+                            <div class="status-content">
+                                <div class="status-title">Promedio General</div>
+                                <div class="status-value" id="globalAverage">--</div>
+                                <div class="status-subtitle">valor LDR</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Panel de Resumen Ejecutivo -->
+                <div class="col-lg-8">
+                    <div class="summary-panel glass mb-4">
+                        <div class="panel-header">
+                            <h4 class="panel-title">
+                                <i class="bi bi-clipboard-data"></i>
+                                Resumen Ejecutivo
+                            </h4>
+                            <div class="panel-actions">
+                                <button class="btn btn-outline-primary btn-sm" id="printSummaryBtn">
+                                    <i class="bi bi-printer"></i>
+                                    Imprimir
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-content">
+                            <!-- Métricas Principales -->
+                            <div class="metrics-grid mb-4">
+                                <div class="metric-item">
+                                    <div class="metric-label">Total de Lecturas</div>
+                                    <div class="metric-value" id="summaryTotal">--</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">Valor Mínimo</div>
+                                    <div class="metric-value metric-value--min" id="summaryMin">--</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">Valor Máximo</div>
+                                    <div class="metric-value metric-value--max" id="summaryMax">--</div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-label">Promedio</div>
+                                    <div class="metric-value metric-value--avg" id="summaryAvg">--</div>
+                                </div>
+                            </div>
+
+                            <!-- Distribución por Ambientes -->
+                            <div class="environment-distribution">
+                                <h5 class="distribution-title">Distribución por Ambientes</h5>
+                                <div class="distribution-bars">
+                                    <div class="distribution-item">
+                                        <div class="distribution-info">
+                                            <span class="environment-label">🌙 Nocturno (0-199)</span>
+                                            <span class="environment-percentage" id="darkPercentage">0%</span>
+                                        </div>
+                                        <div class="progress distribution-progress">
+                                            <div class="progress-bar bg-dark" id="darkProgressBar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="distribution-count" id="darkCount">0 lecturas</small>
+                                    </div>
+                                    
+                                    <div class="distribution-item">
+                                        <div class="distribution-info">
+                                            <span class="environment-label">🌅 Atardecer (200-599)</span>
+                                            <span class="environment-percentage" id="mediumPercentage">0%</span>
+                                        </div>
+                                        <div class="progress distribution-progress">
+                                            <div class="progress-bar bg-warning" id="mediumProgressBar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="distribution-count" id="mediumCount">0 lecturas</small>
+                                    </div>
+                                    
+                                    <div class="distribution-item">
+                                        <div class="distribution-info">
+                                            <span class="environment-label">☀️ Brillante (600-1023)</span>
+                                            <span class="environment-percentage" id="brightPercentage">0%</span>
+                                        </div>
+                                        <div class="progress distribution-progress">
+                                            <div class="progress-bar bg-warning" id="brightProgressBar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="distribution-count" id="brightCount">0 lecturas</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Gráfico de Resumen -->
+                            <div class="summary-chart mt-4">
+                                <h5 class="chart-title">Tendencia General de Datos</h5>
+                                <div class="chart-container">
+                                    <canvas id="summaryChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Exportación -->
+                <div class="col-lg-4">
+                    <div class="export-panel glass mb-4">
+                        <div class="panel-header">
+                            <h4 class="panel-title">
+                                <i class="bi bi-download"></i>
+                                Exportar Datos
+                            </h4>
+                        </div>
+                        
+                        <div class="export-options">
+                            <!-- Exportar PDF -->
+                            <div class="export-option">
+                                <div class="export-header">
+                                    <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                    <div class="export-info">
+                                        <div class="export-title">Reporte PDF</div>
+                                        <div class="export-description">Reporte completo con gráficos</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-danger" id="exportPdfBtn">
+                                    <i class="bi bi-download"></i>
+                                    Generar PDF
+                                </button>
+                            </div>
+
+                            <!-- Exportar Excel -->
+                            <div class="export-option">
+                                <div class="export-header">
+                                    <i class="bi bi-file-earmark-spreadsheet text-success"></i>
+                                    <div class="export-info">
+                                        <div class="export-title">Archivo Excel</div>
+                                        <div class="export-description">Datos completos en hojas separadas</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-success" id="exportExcelBtn">
+                                    <i class="bi bi-download"></i>
+                                    Generar Excel
+                                </button>
+                            </div>
+
+                            <!-- Exportar CSV -->
+                            <div class="export-option">
+                                <div class="export-header">
+                                    <i class="bi bi-filetype-csv text-primary"></i>
+                                    <div class="export-info">
+                                        <div class="export-title">Archivo CSV</div>
+                                        <div class="export-description">Datos sin formato para análisis</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-primary" id="exportCsvBtn">
+                                    <i class="bi bi-download"></i>
+                                    Generar CSV
+                                </button>
+                            </div>
+
+                            <!-- Exportar JSON -->
+                            <div class="export-option">
+                                <div class="export-header">
+                                    <i class="bi bi-filetype-json text-info"></i>
+                                    <div class="export-info">
+                                        <div class="export-title">Datos JSON</div>
+                                        <div class="export-description">Para integración con APIs</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-info" id="exportJsonBtn">
+                                    <i class="bi bi-download"></i>
+                                    Generar JSON
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Configuración de Exportación -->
+                        <div class="export-config mt-4">
+                            <h6 class="config-title">Configuración de Exportación</h6>
+                            
+                            <div class="config-group">
+                                <label class="form-label">Límite de registros</label>
+                                <select class="form-select form-select-sm" id="recordsLimit">
+                                    <option value="50">Últimos 50 registros</option>
+                                    <option value="100">Últimos 100 registros</option>
+                                    <option value="500">Últimos 500 registros</option>
+                                    <option value="all" selected>Todos los registros</option>
+                                </select>
+                            </div>
+
+                            <div class="config-group">
+                                <label class="form-label">Incluir en reporte</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="includeChart" checked>
+                                    <label class="form-check-label" for="includeChart">
+                                        Gráficos y visualizaciones
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="includeStats" checked>
+                                    <label class="form-check-label" for="includeStats">
+                                        Estadísticas detalladas
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="includeRawData" checked>
+                                    <label class="form-check-label" for="includeRawData">
+                                        Datos en bruto
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel de Historial de Exportaciones -->
+                    <div class="export-history-panel glass">
+                        <div class="panel-header">
+                            <h5 class="panel-title">
+                                <i class="bi bi-clock-history"></i>
+                                Exportaciones Recientes
+                            </h5>
+                        </div>
+                        
+                        <div class="export-history" id="exportHistory">
+                            <div class="history-item text-center text-muted py-3">
+                                <i class="bi bi-inbox"></i>
+                                <div>No hay exportaciones recientes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Vista Previa de Datos -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="data-preview-panel glass">
+                        <div class="panel-header">
+                            <h4 class="panel-title">
+                                <i class="bi bi-table"></i>
+                                Vista Previa de Datos
+                            </h4>
+                            <div class="panel-actions">
+                                <span class="data-info" id="previewInfo">
+                                    Mostrando últimos 20 registros
+                                </span>
+                                <button class="btn btn-outline-secondary btn-sm" id="loadMoreBtn">
+                                    <i class="bi bi-plus-circle"></i>
+                                    Cargar Más
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="dataPreviewTable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Valor LDR</th>
+                                        <th>Ambiente</th>
+                                        <th>Fecha y Hora</th>
+                                        <th>Datos en Bruto</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataPreviewBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                            Cargando datos...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Generando...</span>
+            </div>
+            <p class="loading-text mt-3" id="loadingText">Procesando datos...</p>
+        </div>
+    </div>
+
+    <!-- Toast para notificaciones -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                <strong class="me-auto">Reportes LDR</strong>
+                <small class="text-muted">ahora</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Mensaje de notificación
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts modulares -->
+    <script type="module" src="shared/js/config.js"></script>
+    <script type="module" src="shared/js/api-service.js"></script>
+    <!--<script type="module" src="pages/reports/charts.js"></script>-->
+    <script type="module" src="pages/reports/reports.js"></script>
+
+    <!-- Script de carga de navegación -->
+    <script>
+        // Cargar navegación de forma asíncrona
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('shared/components/navigation.html');
+                const navigationHTML = await response.text();
+                document.getElementById('navigation-container').innerHTML = navigationHTML;
+            } catch (error) {
+                console.error('Error cargando navegación:', error);
+            }
+        });
+
+        // Funciones globales para debugging
+        window.reportsDebug = {
+            getStatus: () => window.reportsApp?.getStatus(),
+            exportTest: () => window.reportsApp?.exportAllFormats(),
+            refreshData: () => window.reportsApp?.refreshData(),
+            generateReport: () => window.reportsApp?.generatePdfReport()
+        };
+
+        // Información de debug en consola
+        console.log(`
+        📊 REPORTES LDR v2.0
+        ====================
+        
+        📱 Página: Generación de Reportes
+        🎯 Estado: Inicializando sistema...
+        
+        📈 Funcionalidades:
+        ├── Exportación PDF con gráficos
+        ├── Exportación Excel multi-hoja
+        ├── Exportación CSV para análisis
+        ├── Exportación JSON para APIs
+        └── Vista previa de datos en tiempo real
+        
+        🔧 Controles de debug disponibles:
+        ├── window.reportsDebug.getStatus()
+        ├── window.reportsDebug.exportTest()
+        ├── window.reportsDebug.refreshData()
+        └── window.reportsDebug.generateReport()
+        
+        💡 Características:
+        • Resumen ejecutivo con métricas
+        • Distribución por ambientes
+        • Configuración de exportación
+        • Historial de exportaciones
+        `);
+    </script>
+</body>
+</html>
